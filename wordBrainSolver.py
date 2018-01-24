@@ -4,7 +4,7 @@ import numpy as np
 import sys
 
 
-class WordSolver():
+class WordBrainSolver():
 
 	def __init__(self, array, wordLength):
 		self.x = np.array(array, dtype=str)
@@ -182,6 +182,6 @@ if __name__ == "__main__":
 	array = ['ama','tsr','ard']
 	#array = ['abcd','efgh','ijkl', 'mnop']
 	#array = ['eant','dooi','rclh', 'wasf', 'blea']
-	test = WordSolver(array, 5)
+	test = WordBrainSolver(array, 5)
 	test.main()
 	#test.getAnagrams('citapls')
