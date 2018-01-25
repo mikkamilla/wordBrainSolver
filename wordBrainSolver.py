@@ -25,26 +25,6 @@ class WordBrainSolver():
 		dimension = self.rows - 1 if rowOrCol == 'row' else self.columns - 1
 		return (0 if index == 0 else index - 1, dimension if index == dimension else index + 1)
 
-	def findCombinations(self):
-		for i in range(self.rows):	
-			for j in range(self.columns):
-				print 50 * "-"
-				root = [(i,j)]
-				positions=root
-				print ('root: {0}, in position: {1}'. format(self.matrix[i,j], root))
-				for neighbor in self.findNeighbors(i, j):
-					if neighbor not in positions:
-						combination = self.matrix[i,j]				
-						positions.append(neighbor)
-						combination += self.matrix[neighbor]
-						print('neighbor: {0} -> {1}'. format(neighbor, self.matrix[neighbor]))
-						print('combination:{0} -> {1}'.format(positions, combination))
-						del positions[-1:]
-						(newi, newj) = neighbor
-						for altronei in self.findNeighbors(newi, newj):
-							if altronei not in positions:
-								print('new neigbor: {0} -> {1}'.format(altronei, self.matrix[altronei])) 
-
 	def findNeighbors(self, i, j):
 		(minRow, maxRow) = self.getExtremes(i, 'row')
 		(minCol, maxCol) = self.getExtremes(j, 'col')
@@ -66,42 +46,6 @@ class WordBrainSolver():
 		for item in self.graph:
 			print item, self.graph[item]
 
-
-
-
-
-	def findPathsFromStartToEnd(self, start, end, path=[]):
-		print 50 * "-"
-		path = path + [start]
-		if start == end:
-			return path
-		if not self.graph.has_key(start):
-			return None
-
-
-		for node in self.graph[start]:
-			print "node: ", node
-			if node not in path:
-				print node, " not in path"
-				newpath = self.findPathsFromStartToEnd(node, end, path)
-				if newpath: 
-					#print 'newpath:', newpath
-					return newpath
-
-	def findAllPathsFromStartToEnd(self, start, end, path=[]):
-		path = path + [start]
-		if start == end:
-			return [path]
-		if not self.graph.has_key(start):
-			return []
-		paths = []
-		for node in self.graph[start]:
-			if node not in path:
-				newpaths = self.findAllPathsFromStartToEnd(node, end, path)
-				for newpath in newpaths:
-					paths.append(newpath)
-		return paths
-
 	def findAllPathsAsLongAS(self, start, path=[]):
 		path = path + [start]
 		if len(path) == self.wordLength:
@@ -110,7 +54,7 @@ class WordBrainSolver():
 			return []
 		paths = []
 		for node in self.graph[start]:
-			if node not in path:
+			if node not in path and self.matrix[node].isalpha():
 				newpaths = self.findAllPathsAsLongAS(node, path)
 				for newpath in newpaths:
 					paths.append(newpath)
@@ -124,38 +68,23 @@ class WordBrainSolver():
 			if self.isAValidWord(word):
 				print word
 
-
-
 	def isAValidWord(self, word):
 		d = enchant.Dict("en_US")
 		return d.check(word)
-
-
-
-
 
 	def main(self):
 		self.printMatrix()
 		self.createGraph()
 		print 50 * "-"
 		print "PATHS"
+		print('Looking only for {0} letters words'.format(self.wordLength))
 		print 50 * "-"
-		#print self.findPaths((0,0), (2,2))
-		#print self.findPathsFromStartToEnd((0,0), (1,1))
 		for i in range(self.rows):	
 			for j in range(self.columns):
 				#print self.findAllPathsAsLongAS((i,j))
-				print "start point: ", (i,j), "->", self.matrix[(i,j)]
-				self.translate(self.findAllPathsAsLongAS((i,j)))
-
-
-
-
-
-
-
-
-
+				if self.matrix[(i,j)].isalpha():
+					print "start point: ", (i,j), "->", self.matrix[(i,j)]
+					self.translate(self.findAllPathsAsLongAS((i,j)))
 
 	def getAnagrams(self, jumbled_letters):
 		all_words = nltk.corpus.words.words()
@@ -179,9 +108,10 @@ class WordBrainSolver():
 if __name__ == "__main__":
 	#array = ['ab', 'cd']
 	#array = ['abc', 'def','ghi']
-	array = ['ama','tsr','ard']
+	#array = ['ama','tsr','ard']
 	#array = ['abcd','efgh','ijkl', 'mnop']
-	#array = ['eant','dooi','rclh', 'wasf', 'blea']
-	test = WordBrainSolver(array, 5)
+	#array = ['nvne','aytm','cgin', 'eren', 'nroe']
+	array = ['etprf', 'lecar', 'haura', 'gnsbc', 'irtes']
+	test = WordBrainSolver(array, 8)
 	test.main()
 	#test.getAnagrams('citapls')
