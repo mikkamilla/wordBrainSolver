@@ -1,4 +1,5 @@
 import nltk
+from nltk.corpus import words
 import enchant
 import numpy as np
 import sys
@@ -12,6 +13,8 @@ class WordBrainSolver():
 		self.wordLength = wordLength
 		(self.rows, self.columns) = self.matrix.shape
 		self.graph = {}
+		wordlist = (line.strip() for line in open('words_alpha.txt'))
+		self.wordset = set([ parola[:3] for parola in wordlist if len(parola) >=3 ])
 
 	def printMatrix(self):
 		print 50 * "-"
@@ -24,6 +27,9 @@ class WordBrainSolver():
 		#rowOrCol can be 'row' or 'col'
 		dimension = self.rows - 1 if rowOrCol == 'row' else self.columns - 1
 		return (0 if index == 0 else index - 1, dimension if index == dimension else index + 1)
+
+	def getWordSet(self):
+		return self.wordset
 
 	def findNeighbors(self, i, j):
 		(minRow, maxRow) = self.getExtremes(i, 'row')
@@ -48,6 +54,13 @@ class WordBrainSolver():
 
 	def findAllPathsAsLongAS(self, start, path=[]):
 		path = path + [start]
+		if len(path) == 3:
+			#print "NEWPATH", path
+			if (self.matrix[path[0]] + self.matrix[path[1]] + self.matrix[path[2]] not in self.wordset):
+				#print self.matrix[path[0]] + self.matrix[path[1]] + self.matrix[path[2]]
+				#print "questo proprio non ci sta"
+				#che faccio qui? non sono in un loop, non posso usare break o continue
+				pass
 		if len(path) == self.wordLength:
 			return [path]
 		if not self.graph.has_key(start):
@@ -62,15 +75,24 @@ class WordBrainSolver():
 
 	def translate(self, combinations):
 		for combination in combinations:
+			#print("Combination: {0}".format(combination))
 			word = ''
 			for tupla in combination:
 				word += self.matrix[tupla]
+
 			if self.isAValidWord(word):
-				print word
+				#print "###################"
+				print("###################Valid english word: {0}".format(word))
+				#print "###################"
+			#else: print("NON valid english word: {0}".format(word))
+
 
 	def isAValidWord(self, word):
 		d = enchant.Dict("en_US")
 		return d.check(word)
+
+	def temp(self):
+		"would" in words.words()
 
 	def main(self):
 		self.printMatrix()
@@ -81,7 +103,6 @@ class WordBrainSolver():
 		print 50 * "-"
 		for i in range(self.rows):	
 			for j in range(self.columns):
-				#print self.findAllPathsAsLongAS((i,j))
 				if self.matrix[(i,j)].isalpha():
 					print "start point: ", (i,j), "->", self.matrix[(i,j)]
 					self.translate(self.findAllPathsAsLongAS((i,j)))
@@ -107,11 +128,20 @@ class WordBrainSolver():
 
 if __name__ == "__main__":
 	#array = ['ab', 'cd']
-	#array = ['abc', 'def','ghi']
+	array = [	'azx', 
+				'rwy',
+				'eax']
 	#array = ['ama','tsr','ard']
-	#array = ['abcd','efgh','ijkl', 'mnop']
+	#array = ['dks','oah','pro', 'arp']
 	#array = ['nvne','aytm','cgin', 'eren', 'nroe']
-	array = ['etprf', 'lecar', 'haura', 'gnsbc', 'irtes']
-	test = WordBrainSolver(array, 8)
+	'''
+	array = [	'ca---', 
+				'iar-o', 
+				'baagr', 
+				'ecinr', 
+				'dtsao']
+	'''
+	test = WordBrainSolver(array, 4)
 	test.main()
+	#print len(test.getWordSet())
 	#test.getAnagrams('citapls')
