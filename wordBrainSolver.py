@@ -58,9 +58,9 @@ class WordBrainSolver():
 			#print "NEWPATH", path
 			if (self.matrix[path[0]] + self.matrix[path[1]] + self.matrix[path[2]] not in self.wordset):
 				#print self.matrix[path[0]] + self.matrix[path[1]] + self.matrix[path[2]]
-				#print "questo proprio non ci sta"
+				print "questo proprio non ci sta", path
 				#che faccio qui? non sono in un loop, non posso usare break o continue
-				pass
+				return []
 		if len(path) == self.wordLength:
 			return [path]
 		if not self.graph.has_key(start):
@@ -71,6 +71,7 @@ class WordBrainSolver():
 				newpaths = self.findAllPathsAsLongAS(node, path)
 				for newpath in newpaths:
 					paths.append(newpath)
+		#print paths
 		return paths
 
 	def translate(self, combinations):
@@ -128,20 +129,22 @@ class WordBrainSolver():
 
 if __name__ == "__main__":
 	#array = ['ab', 'cd']
+	'''
 	array = [	'azx', 
 				'rwy',
 				'eax']
+	'''
 	#array = ['ama','tsr','ard']
 	#array = ['dks','oah','pro', 'arp']
 	#array = ['nvne','aytm','cgin', 'eren', 'nroe']
-	'''
-	array = [	'ca---', 
-				'iar-o', 
-				'baagr', 
-				'ecinr', 
-				'dtsao']
-	'''
-	test = WordBrainSolver(array, 4)
+	
+	array = [	'etpr', 
+				'leca', 
+				'haur', 
+				'gnsb', 
+				'irte']
+	
+	test = WordBrainSolver(array, 8)
 	test.main()
 	#print len(test.getWordSet())
 	#test.getAnagrams('citapls')
