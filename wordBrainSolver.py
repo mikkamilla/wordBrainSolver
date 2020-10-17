@@ -1,18 +1,30 @@
-import nltk
-import enchant
+#import nltk
+#from nltk.corpus import words
+#import enchant
 import numpy as np
 import sys
 
 
 class WordBrainSolver():
 
-	def __init__(self, array, wordLength):
-		self.x = np.array(array, dtype=str)
-		self.matrix = self.x.view('S1').reshape((self.x.size, -1))
-		self.wordLength = wordLength
+	def __init__(self, array, wordLengths):
+		x = np.array(array, dtype=str)
+		self.matrix = x.view('S1').reshape((x.size, -1))
+		self.wordLengths = wordLengths
 		(self.rows, self.columns) = self.matrix.shape
-		self.graph = {}
 
+		sum = 0
+		try:
+			for num in wordLengths:
+				sum += num
+		except TypeError: 
+			sys.exit("check syntax, you need wordLengths to be a tuple of numbers")
+		if  not (sum == (self.rows * self.columns)):
+			sys.exit("check word lenghts you provided")
+
+		self.graph = {}
+		#self.wordlist = (line.strip() for line in open('words_alpha.txt'))
+		
 	def printMatrix(self):
 		print 50 * "-"
 		print "MATRIX"
@@ -24,6 +36,9 @@ class WordBrainSolver():
 		#rowOrCol can be 'row' or 'col'
 		dimension = self.rows - 1 if rowOrCol == 'row' else self.columns - 1
 		return (0 if index == 0 else index - 1, dimension if index == dimension else index + 1)
+
+	def getWordSet(self):
+		return self.wordset
 
 	def findNeighbors(self, i, j):
 		(minRow, maxRow) = self.getExtremes(i, 'row')
@@ -43,11 +58,22 @@ class WordBrainSolver():
 			for j in range(self.columns):
 				root = (i,j)
 				self.graph[root] = self.findNeighbors(i, j)
+
+	def printGraph(self):
 		for item in self.graph:
 			print item, self.graph[item]
 
 	def findAllPathsAsLongAS(self, start, path=[]):
 		path = path + [start]
+		if len(path) >= 2:
+			#print("Path: {0}".format(path))
+			parola = ''
+			for tupla in path:
+				parola += self.matrix[tupla]
+			print("Parola: {0}, len: {1}".format(parola, len(parola)))
+			if parola not in set([ parola[:len(path)] for parola in (line.strip() for line in open('words_alpha.txt')) if len(parola) >= len(path) ]):
+				print("{0} proprio non ci sta".format(parola))
+				return []
 		if len(path) == self.wordLength:
 			return [path]
 		if not self.graph.has_key(start):
@@ -58,33 +84,43 @@ class WordBrainSolver():
 				newpaths = self.findAllPathsAsLongAS(node, path)
 				for newpath in newpaths:
 					paths.append(newpath)
+		#print paths
 		return paths
 
 	def translate(self, combinations):
 		for combination in combinations:
+			print("Combination: {0}".format(combination))
 			word = ''
 			for tupla in combination:
 				word += self.matrix[tupla]
+
 			if self.isAValidWord(word):
-				print word
+				#print "###################"
+				print("###################Valid english word: {0}".format(word))
+				#print "###################"
+			#else: print("NON valid english word: {0}".format(word))
+
 
 	def isAValidWord(self, word):
 		d = enchant.Dict("en_US")
 		return d.check(word)
 
+	def temp(self):
+		"would" in words.words()
+
 	def main(self):
 		self.printMatrix()
 		self.createGraph()
-		print 50 * "-"
-		print "PATHS"
-		print('Looking only for {0} letters words'.format(self.wordLength))
-		print 50 * "-"
-		for i in range(self.rows):	
-			for j in range(self.columns):
-				#print self.findAllPathsAsLongAS((i,j))
-				if self.matrix[(i,j)].isalpha():
-					print "start point: ", (i,j), "->", self.matrix[(i,j)]
-					self.translate(self.findAllPathsAsLongAS((i,j)))
+		self.printGraph()
+		#print 50 * "-"
+		#print "PATHS"
+		#print('Looking only for {0} letters words'.format(self.wordLength))
+		#print 50 * "-"
+		#for i in range(self.rows):	
+		#	for j in range(self.columns):
+		#		if self.matrix[(i,j)].isalpha():
+		#			print "start point: ", (i,j), "->", self.matrix[(i,j)]
+		#			self.translate(self.findAllPathsAsLongAS((i,j)))
 
 	def getAnagrams(self, jumbled_letters):
 		all_words = nltk.corpus.words.words()
@@ -107,11 +143,22 @@ class WordBrainSolver():
 
 if __name__ == "__main__":
 	#array = ['ab', 'cd']
-	#array = ['abc', 'def','ghi']
+
+	array = [	'asx', 
+				'rwy',
+				'eax']
+
 	#array = ['ama','tsr','ard']
-	#array = ['abcd','efgh','ijkl', 'mnop']
+	#array = ['dks','oah','pro', 'arp']
 	#array = ['nvne','aytm','cgin', 'eren', 'nroe']
-	array = ['etprf', 'lecar', 'haura', 'gnsbc', 'irtes']
-	test = WordBrainSolver(array, 8)
+	"""
+	array = [	'etpr', 
+				'leca', 
+				'haur', 
+				'gnsb', 
+				'irte']
+	"""
+	test = WordBrainSolver(array, (4,3,2))
 	test.main()
+	#print len(test.getWordSet())
 	#test.getAnagrams('citapls')
