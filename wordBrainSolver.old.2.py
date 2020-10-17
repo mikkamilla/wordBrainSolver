@@ -1,30 +1,21 @@
-#import nltk
-#from nltk.corpus import words
-#import enchant
+import nltk
+from nltk.corpus import words
+import enchant
 import numpy as np
 import sys
 
 
 class WordBrainSolver():
 
-	def __init__(self, array, wordLengths):
-		x = np.array(array, dtype=str)
-		self.matrix = x.view('S1').reshape((x.size, -1))
-		self.wordLengths = wordLengths
+	def __init__(self, array, wordLength):
+		self.x = np.array(array, dtype=str)
+		self.matrix = self.x.view('S1').reshape((self.x.size, -1))
+		self.wordLength = wordLength
 		(self.rows, self.columns) = self.matrix.shape
-
-		sum = 0
-		try:
-			for num in wordLengths:
-				sum += num
-		except TypeError: 
-			sys.exit("check syntax, you need wordLengths to be a tuple of numbers")
-		if  not (sum == (self.rows * self.columns)):
-			sys.exit("check word lenghts you provided")
-
 		self.graph = {}
-		#self.wordlist = (line.strip() for line in open('words_alpha.txt'))
-		
+		self.wordlist = (line.strip() for line in open('words_alpha.txt'))
+		#self.wordset = set([ parola[:3] for parola in wordlist if len(parola) >=3 ])
+
 	def printMatrix(self):
 		print 50 * "-"
 		print "MATRIX"
@@ -58,8 +49,6 @@ class WordBrainSolver():
 			for j in range(self.columns):
 				root = (i,j)
 				self.graph[root] = self.findNeighbors(i, j)
-
-	def printGraph(self):
 		for item in self.graph:
 			print item, self.graph[item]
 
@@ -111,16 +100,15 @@ class WordBrainSolver():
 	def main(self):
 		self.printMatrix()
 		self.createGraph()
-		self.printGraph()
-		#print 50 * "-"
-		#print "PATHS"
-		#print('Looking only for {0} letters words'.format(self.wordLength))
-		#print 50 * "-"
-		#for i in range(self.rows):	
-		#	for j in range(self.columns):
-		#		if self.matrix[(i,j)].isalpha():
-		#			print "start point: ", (i,j), "->", self.matrix[(i,j)]
-		#			self.translate(self.findAllPathsAsLongAS((i,j)))
+		print 50 * "-"
+		print "PATHS"
+		print('Looking only for {0} letters words'.format(self.wordLength))
+		print 50 * "-"
+		for i in range(self.rows):	
+			for j in range(self.columns):
+				if self.matrix[(i,j)].isalpha():
+					print "start point: ", (i,j), "->", self.matrix[(i,j)]
+					self.translate(self.findAllPathsAsLongAS((i,j)))
 
 	def getAnagrams(self, jumbled_letters):
 		all_words = nltk.corpus.words.words()
@@ -158,7 +146,7 @@ if __name__ == "__main__":
 				'gnsb', 
 				'irte']
 	"""
-	test = WordBrainSolver(array, (4,3,2))
+	test = WordBrainSolver(array, 4)
 	test.main()
 	#print len(test.getWordSet())
 	#test.getAnagrams('citapls')
